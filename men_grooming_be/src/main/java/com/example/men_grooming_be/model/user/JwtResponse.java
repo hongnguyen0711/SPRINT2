@@ -1,13 +1,10 @@
 package com.example.men_grooming_be.model.user;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
 import java.util.Collection;
-@Getter
-@Setter
+
 public class JwtResponse implements Serializable {
     private String jwtToken;
     private String userName;
@@ -16,11 +13,9 @@ public class JwtResponse implements Serializable {
 
     public JwtResponse() {
     }
-
     public JwtResponse(String jwtToken) {
         this.jwtToken = jwtToken;
     }
-
     public JwtResponse(String jwtToken, String userName, Collection<? extends GrantedAuthority> grantList, Boolean flagOnline) {
         this.jwtToken = jwtToken;
         this.userName = userName;
