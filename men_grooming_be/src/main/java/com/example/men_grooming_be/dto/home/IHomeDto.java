@@ -1,6 +1,6 @@
 package com.example.men_grooming_be.dto.home;
 
-public interface IHome {
+public interface IHomeDto {
     Long getIdProduct();
     String getNameProduct();
     Double getPriceProduct();

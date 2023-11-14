@@ -1,4 +1,4 @@
-package com.example.men_grooming_be.dto.home;
+package com.example.men_grooming_be.repository.home;
 
 import com.example.men_grooming_be.model.product.Category;
 import org.springframework.data.jpa.repository.JpaRepository;

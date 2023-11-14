@@ -22,6 +22,7 @@ public class Product {
     private String brand;
     private String fragrant;
     private Integer quantity;
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     @ManyToOne
     @JoinColumn(name = "idCategory", referencedColumnName = "id")
