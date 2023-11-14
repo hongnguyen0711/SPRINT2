@@ -4,12 +4,27 @@ import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import {useNavigate} from "react-router";
 import {jwtDecode} from "jwt-decode";
+import * as homeService from "../service/HomeService";
+import {log} from "async";
 
 export function Home() {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState("");
+    const [products, setProducts] = useState([]);
+    const vnd = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    })
+
+    const getProductList = async () => {
+        const array = await homeService.getListProduct();
+        console.log(array);
+        setProducts(array.data);
+    }
+
     useEffect(() => {
+        getProductList();
         if (localStorage.getItem("JWT")) {
             setIsLoggedIn(true);
             setUsername(jwtDecode(localStorage.getItem("JWT")).sub);
@@ -71,7 +86,7 @@ export function Home() {
                                     </div>
                                 ) : (
                                     <div className="user-info">
-                                        <a href="#" className="register-btn mx-2 text-dark text-decoration-none"
+                                        <a href="#" className="btn mx-2 text-dark text-decoration-none"
                                            onClick={handleRegister}>
                                             Đăng nhập <FontAwesomeIcon icon={faSignInAlt}/>
                                         </a>
@@ -115,7 +130,7 @@ export function Home() {
                                  className="d-block w-100" alt="..."/>
                             <div className="carousel-caption d-none d-md-block">
                                 <h4>Mỹ phẩm chính hãng</h4>
-                                <p>Some representative placeholder content for the third slide.</p>
+                                <p>Cam kết mỹ phẩm nhập khẩu chính hãng.</p>
                             </div>
                         </div>
                     </div>
@@ -136,7 +151,7 @@ export function Home() {
                     className="section-title section-title-bold-center">
                     <b></b><span
                     className="section-title-main" style={{fontSize: "81%"}}>CHÚNG TÔI CÓ GÌ?</span><b></b></h3></div>
-                <div className="row row-divided" id="row-299623123">
+                <div className="row row-divided " id="row-299623123" style={{marginLeft: "14%"}}>
 
                     <div id="col-33895845" className="col medium-4 large-4">
                         <div className="col-inner">
@@ -201,7 +216,7 @@ export function Home() {
                                     </div>
                                 </div>
                                 <div className="icon-box-text last-reset">
-                                    <h5 className="uppercase">Giao Hàng Toàn Quốc</h5>
+                                    <h5 className="uppercase">GIAO HÀNG TOÀN QUỐC</h5>
                                     <p style={{textAlign: "justify"}}><span style={{color: "#000000"}}>Giao hàng toàn quốc, nhập hàng trước &#8211; thanh toán sau. Chỉ với thao tác đặt hàng nhanh chóng qua Website.</span>
                                     </p>
                                 </div>
@@ -214,95 +229,54 @@ export function Home() {
                 <div className="container">
                     <h2 className="sub-title">SẢN PHẨM NỔI BẬT</h2>
                     <div className="exclusives">
-                        <div>
-                            <Link to={"/detail"} className="text-decoration-none">
-                                <img src="https://static.30shine.com/shop-admin/2023/08/18/30SAFG66-vn-11134207-7qukw-ljcj272stqto77_tn.jpeg"/>
-                                <span>
-                                    <h6>Kevin Murphy Rough Rider</h6>
-                                    <p>250.000 đ</p>
+                        {
+                            products.length !== 0 ? (
+                                products.map((product)=>{
+                                    return(
+                                        <div key={product.idProduct}>
+                                            <Link to={"/detail"} className="text-decoration-none">
+                                                <img
+                                                    src={product.firstImage}/>
+                                                <span>
+                                    <h6>{product.nameProduct}</h6>
+                                    <p>{vnd.format(product.priceProduct)}</p>
                                 </span>
-                            </Link>
-                        </div>
-                        <div>
-                            <img
-                                src="https://static.30shine.com/shop-admin/2023/08/21/30SHQL57-vn-11134207-7qukw-ljcio5w4dluaae_tn.jpeg"/>
-                            <span>
-                <h6>Vocanic Clay</h6>
-                <p>250.000 đ</p>
-                            </span>
-                        </div>
-                        <div>
-                            <img src="https://static.30shine.com/shop-admin/2023/05/15/30S1R7HT-reuzel-red.jpg"/>
-                            <span>
-                <h6>Vocanic Clay</h6>
-                <p>250.000 đ</p>
-                            </span>
-                        </div>
-                        <div>
-                            <img src="https://static.30shine.com/shop-admin/2023/05/15/30S1R7HT-reuzel-red.jpg"/>
-                            <span>
-                <h6>Reuzel Red Pomade </h6>
-                <p>250.000 đ</p>
-                              </span>
-                        </div>
-                        <div>
-                            <img
-                                src="https://static.30shine.com/shop-admin/2023/08/16/30S8LBRR-30SL05LK-Sa%CC%81p%20Ta%CC%A3o%20Kie%CC%82%CC%89u%20TEA%20TREE%20SHAPING%20CREAM%20-%20Su%CC%9B%CC%A3%20lu%CC%9B%CC%A3a%20cho%CC%A3n%20ha%CC%80ng%20%C4%91a%CC%82%CC%80u%20cho%20ma%CC%81i%20to%CC%81c%20da%CC%80i%20la%CC%83ng%20tu%CC%9B%CC%89%20%C4%91a%CC%82%CC%80y%20lo%CC%82i%20cuo%CC%82%CC%81n.jpg"/>
-                            <span>
-                <h6>Tea Tree Shapinig Cream</h6>
-                <p>729.000 ₫</p>
-                              </span>
-                        </div>
-                        <div>
-                            <img src="https://static.30shine.com/shop-admin/2023/08/16/30SUQIM9-image_2.jpg"/>
-                            <span>
-                <h6>Gôm xịt giữ nếp tóc Glanzen</h6>
-                <p>259.000 ₫</p>
-                               </span>
-                        </div>
-                        <div>
-                            <img src="https://static.30shine.com/shop-admin/2023/08/16/30SO0AIF-image_7.jpg"/>
-                            <span>
-                <h6>Xịt tạo phồng Glanzen Booster</h6>
-                <p>199.000 ₫</p>
-                             </span>
-                        </div>
-                        <div>
-                            <img
-                                src="https://static.30shine.com/shop-admin/2022/03/02/30SGH4QK-M%C3%A1y%20S%E1%BA%A5y%20t%C3%B3c%20-%20USP.jpg"/>
-                            <span>
-                <h6>Máy sấy tóc Sharkway Limited 1600W</h6>
-                <p>299.000 ₫</p>
-                             </span>
-                        </div>
+                                            </Link>
+                                        </div>
+                                    );
+                                })
+                            ) :(<p>Không tìm thấy!</p>)
+                        }
+
                     </div>
                     <h2 className="sub-title">CÁC LOẠI SẢN PHẨM</h2>
                     <div className="trending">
-                        <div>
+                        <div className="text-center">
                             <img
-                                src="https://static.30shine.com/shop-admin/2023/05/16/30S4HPU5-Reuzel-Pink-Pomade.jpg"/>
-                            <h6>Reuzel Pink Pomade</h6>
+                                src="https://static.30shine.com/shop-admin/2023/05/06/30SI9BUD-review-sap-reuzel-pomade.jpg"/>
+                            <h5 className="mt-3">SÁP VUỐT TÓC</h5>
                         </div>
-                        <div>
+                        <div className="text-center">
+                            <img
+                                src="https://storage.30shine.com/30shine-store/product-images/9956dbac-f00e-4feb-b1b9-5868749fd451"/>
+                            <h5 className="mt-3">GÔM DỮ NẾP</h5>
+                        </div>
+                        <div className="text-center">
                             <img
                                 src="https://storage.30shine.com/30shine-store/product-images/86a7d926-6fca-46ad-bc2b-22ba54905b31"/>
-                            <h6>By Vilain - Sidekick</h6>
+                            <h5 className="mt-3">PRE STYLING</h5>
                         </div>
-                        <div>
+                        <div className="text-center">
                             <img
-                                src="https://static.30shine.com/shop-admin/2021/10/04/30SOG0CD-G%C3%B4m%20Tigi%20Hard%20Head%20si%C3%AAu%20c%E1%BB%A9ng.png"/>
-                            <h6>TIGI HARD HEAD 385ml</h6>
-                        </div>
-                        <div>
-                            <img
-                                src="https://static.30shine.com/shop-admin/2021/12/29/30S0KEIE-M%C3%A1y%20s%E1%BA%A5y%20Furin.jpg"/>
-                            <h6>Máy sấy tóc Furin</h6>
+                                src="https://storage.30shine.com/30shine-store/product-images/8796a6ec-a6f1-419b-9edf-e2aab7f2b4a7"/>
+                            <h5 className="mt-3">DƯỠNG TÓC</h5>
                         </div>
                     </div>
                     <div className="cta">
                         <h3>Men's <br/>Grooming</h3>
-                        <p>LÀ CHÍNH MÌNH giúp bạn trở nên khác biệt</p>
-                        <a href="#" className="cta-btn">Mua Ngay.</a>
+                        <p><span style={{fontSize: "150%", color: "#e2f89f"}}>LÀ CHÍNH MÌNH</span> giúp bạn trở nên khác
+                            biệt.</p>
+                        <a href="#" className="cta-btn text-decoration-none">Mua Ngay.</a>
                     </div>
                     <h2 className="sub-title">BLOGS</h2>
                     <div className="stories">

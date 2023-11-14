@@ -6,7 +6,7 @@ export function Detail() {
 return(
     <>
         <Header/>
-        <section className="py-5">
+        <section className="py-5 mt-5">
             <div className="container">
                 <div className="row gx-5">
                     <aside className="col-lg-6">

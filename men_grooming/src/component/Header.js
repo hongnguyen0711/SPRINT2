@@ -26,7 +26,7 @@ export function Header() {
     };
 return(
     <>
-        <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top mb-5">
             <div className="container-fluid">
                 <a className="navbar-brand" href="#">
                     <img
@@ -69,7 +69,7 @@ return(
                             </div>
                         ) : (
                             <div className="user-info">
-                                <a href="#" className="register-btn mx-2 text-dark text-decoration-none"
+                                <a href="#" className="logout-btn mx-2 text-dark text-decoration-none"
                                    onClick={handleRegister}>
                                     Đăng nhập <FontAwesomeIcon icon={faSignInAlt}/>
                                 </a>
