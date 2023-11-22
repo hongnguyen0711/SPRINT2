@@ -1,13 +1,15 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
+import {faCartFlatbed, faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 import {jwtDecode} from "jwt-decode";
+import {Link} from "react-router-dom";
 
 export function Header() {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState("");
+    const [searchName, setSearchName] = useState("");
     useEffect(() => {
         if (localStorage.getItem("JWT")) {
             setIsLoggedIn(true);
@@ -24,6 +26,13 @@ export function Header() {
         setUsername("");
         navigate("/");
     };
+
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter' && searchName.trim() !== '') {
+            searchName && navigate(`/search/${searchName.trim()}`)
+        }
+    }
 return(
     <>
         <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top mb-5">
@@ -42,21 +51,48 @@ return(
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <a className="nav-link active" aria-current="page" href="#">Home</a>
+                            <Link to={"/"} className="text-decoration-none">
+                                <a className="nav-link active" aria-current="page" href="#">Home</a>
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Danh sách sản phẩm</a>
+                            <Link to={"/list"} className="text-decoration-none">
+                            <a className="nav-link" href="#">Danh Sách Sản Phẩm</a>
+                            </Link>
                         </li>
-
+                        <li className="nav-item dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                Danh Mục
+                            </a>
+                            <ul className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><Link to={"/category/1"} className="text-decoration-none text-dark">
+                                        <a className="dropdown-item" href="#">Sáp Vuốt Tóc</a></Link></li>
+                                <li><Link to={"/category/2"} className="text-decoration-none text-dark">
+                                    <a className="dropdown-item" href="#">Gôm Dữ Nếp</a></Link></li>
+                                <li><Link to={"/category/3"} className="text-decoration-none text-dark">
+                                        <a className="dropdown-item" href="#">Pre Styling</a></Link></li>
+                                <li><Link to={"/category/4"} className="text-decoration-none text-dark">
+                                        <a className="dropdown-item" href="#">Dưỡng Tóc</a></Link></li>
+                            </ul>
+                        </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled" href="#" tabIndex="-1"
-                               aria-disabled="true">Quản lý</a>
+                            <Link to={"/info"} className="text-decoration-none">
+                                <a className="nav-link active" aria-current="page" href="#">Thông tin</a>
+                            </Link>
                         </li>
                     </ul>
                     <form className="d-flex">
-                        <input className="form-control me-2" type="search" placeholder="search"
-                               aria-label="Search"/>
-                        <button className="btn btn-outline-secondary w-50" type="submit">Tìm kiếm</button>
+                        <input className="form-control me-2" type="search" placeholder="search" aria-label="Search"
+                               onChange={(event) => {
+                                   const value = event.target.value;
+                                   setSearchName(value);
+                               }}
+                               onKeyDown={handleKeyDown}
+                        />
+                        <Link to={"/cart"} className="text-decoration-none m-auto">
+                        <FontAwesomeIcon icon={faCartFlatbed} className="m-auto mx-3"/>
+                        </Link>
                     </form>
                     <div className="login-section mx-2">
                         {isLoggedIn ? (
@@ -79,6 +115,7 @@ return(
                 </div>
             </div>
         </nav>
+
         </>
 );
 }

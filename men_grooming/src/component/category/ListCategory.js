@@ -4,19 +4,23 @@ import {Footer} from "../Footer";
 import React, {useEffect, useState} from "react";
 import * as productService from "../../service/ProductService";
 import {toast} from "react-toastify";
-import {useParams} from "react-router";
+import {useNavigate, useParams} from "react-router";
+import * as loginService from "../../service/UserService";
+import * as cartService from "../../service/CartService";
 
-export function ListWax() {
+export function ListCategory() {
+    const navigate = useNavigate();
     const {id} = useParams();
     const [products, setProducts] = useState([]);
     const [limit, setLimit] = useState("");
-    const [page, setPage] = useState("");
+    const [page, setPage] = useState(0);
     const [records, setRecords] = useState();
     const [totalPage, setTotalPage] = useState();
     const [searchName, setSearchName] = useState("");
     const [searchCategory, setSearchCategory] = useState(`${id}`);
     const [searchFragrant, setSearchFragrant] = useState("");
     const [refresh, setRefresh] = useState(true);
+    const [quantity, setQuantity] = useState(1);
     const pattern = /[!@#$%^&*()_+=|{}<>?]/;
 
     const vnd = new Intl.NumberFormat('vi-VN', {
@@ -24,8 +28,30 @@ export function ListWax() {
         currency: 'VND'
     })
 
-    const getProductList = async () => {
+    function truncateString(str) {
+        return str.length > 23 ? str.slice(0, 23) + '...' : str;
+    }
+
+    const getIntoCart = async (idProduct) => {
         try {
+            const jwtToken = await loginService.getJwtToken();
+            if (!jwtToken) {
+                navigate("/login")
+                toast("Vui lòng đăng nhập!")
+            }
+            const getUser = await loginService.getUser(jwtToken.sub);
+            const res = await cartService.addToCart(idProduct, getUser.id, quantity);
+            if (res.status === 200){
+                toast("Thêm vào giỏ hàng thành công!");
+            }
+        }catch (e) {
+
+        }
+
+    }
+    const getProductListByCategory = async (id) => {
+        try {
+            setSearchCategory(id);
             const array = await productService.getAllListProduct(limit, page, searchName, searchCategory, searchFragrant);
             setProducts(array.data.content);
             setRecords(array.data.totalElements);
@@ -36,9 +62,11 @@ export function ListWax() {
             setPage(0);
         }
     }
+
     useEffect(() => {
-        getProductList();
-    }, [page, refresh]);
+        // getProductList();
+        getProductListByCategory(id);
+    }, [page, refresh, id, searchCategory]);
 
     const handleSearch = () => {
         if (pattern.test(searchName)) {
@@ -61,93 +89,131 @@ export function ListWax() {
     const nextPage = () => {
         setPage(page + 1);
     }
-return(
-    <>
-        <Header/>
-        <div className="container">
-            <h2>AA</h2>
-            <h3 className="mt-5">DANH SÁCH SẢN PHẨM</h3>
-            <div className="col-12 d-flex justify-content-end mt-3 mb-3">
+    let content;
 
-                <div className="col-auto mx-1">
-                    <input
-                        className="form-control"
-                        type="search"
-                        placeholder="Tìm theo tên"
-                        aria-label="Search"
-                        style={{ width: '200px' }}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setSearchName(value);
-                            // setSearchFragrant(value);
-                        }}
-                        onKeyDown={handleKeyDown}
-                    />
+    switch (id) {
+        case '1':
+            content = <h3 className="mt-5">SÁP VUỐT TÓC</h3>;
+            break;
+        case '2':
+            content = <h3 className="mt-5">GÔM DỮ NẾP</h3>;
+            break;
+        case '3':
+            content = <h3 className="mt-5">PRE STYLING</h3>;
+            break;
+        case '4':
+            content = <h3 className="mt-5">DƯỠNG TÓC</h3>;
+            break;
+        default:
+    }
+    return (
+        <>
+            <Header/>
+            <div className="container">
+                <h2>AA</h2>
+                {content}
+                <div className="col-12 d-flex justify-content-end mt-3 mb-3">
+                    <div className="col-auto mx-1">
+                        <input
+                            className="form-control"
+                            type="search"
+                            placeholder="Tìm mùi hương"
+                            aria-label="Search"
+                            style={{ width: '150px' }}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                // setSearchName(value);
+                                setSearchFragrant(value);
+                            }}
+                            onKeyDown={handleKeyDown}
+                        />
+                    </div>
+                    <div className="col-auto mx-1">
+                        <input
+                            className="form-control"
+                            type="search"
+                            placeholder="Tìm theo tên"
+                            aria-label="Search"
+                            style={{width: '200px'}}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setSearchName(value);
+                                // setSearchFragrant(value);
+                            }}
+                            onKeyDown={handleKeyDown}
+                        />
 
+                    </div>
+                    <div className="col-auto mx-1">
+                        <button className="btn btn-outline-primary text-center" type="button"
+                                onClick={handleSearch}>Tìm kiếm
+                        </button>
+                    </div>
                 </div>
-                <div className="col-auto mx-1">
-                    <button className="btn btn-outline-primary text-center" type="button"
-                            onClick={handleSearch}>Tìm kiếm
-                    </button>
-                </div>
-            </div>
 
-            <div className="exclusives mt-5">
-                {
-                    products.length !== 0 ? (
-                        products.map((product) => {
-                            return (
-                                <div key={product.idProduct}>
-                                    <Link to={"/detail"} className="text-decoration-none">
-                                        <img
-                                            src={product.firstImage}/>
-                                        <span>
-                                    <h6>{product.nameProduct}</h6>
+                <div className="exclusives mt-5">
+                    {
+                        products.length !== 0 ? (
+                            products.map((product) => {
+                                return (
+                                    <div key={product.idProduct}>
+                                        <Link to={`/detail/${product.idProduct}`} className="text-decoration-none">
+                                            <img
+                                                src={product.firstImage}/>
+                                            <span>
+                                    <h6>{truncateString(product.nameProduct)}</h6>
                                     <p>{vnd.format(product.priceProduct)}</p>
                                 </span>
-                                    </Link>
-                                </div>
-                            );
-                        })
-                    ) : (<p>Không tìm thấy!</p>)
-                }
-            </div>
-            <div className="container d-flex align-items-center justify-content-center">
-                <div className="my-2">
-                    <div className="row text-center">
-                        <div className="ms-auto">
-                            <nav className="bottom" aria-label="Page navigation">
-                                <ul className="pagination mb-0 ">
-                                    <li className="page-item">
-                                        <a className={`page-link ${page === 0 ? "disabled" : ""}`}
-                                           onClick={() => setPage(0)} tabIndex="-1" href="#"
-                                           aria-disabled="true">《</a>
-                                    </li>
-                                    <li className="page-item ">
-                                        <a onClick={() => previousPage()}
-                                           className={`page-link ${page <= 0 ? "disabled" : ""}`} href="#" tabIndex="-1"
-                                           aria-disabled="true">〈 </a>
-                                    </li>
-                                    <li className="page-item" aria-current="page">
-                                        <a className="page-link" href="#">{page + 1}/{totalPage}</a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a onClick={() => nextPage()}
-                                           className={`page-link ${page >= totalPage - 1 ? "disabled" : ""}`}
-                                           href="#"> 〉 </a>
-                                    </li>
-                                    <li className="page-item">
-                                        <a className={`page-link ${page >= totalPage - 1 ? "disabled" : ""}`} href="#"
-                                           onClick={() => setPage(totalPage - 1)}> 》 </a>
-                                    </li>
-                                </ul>
-                            </nav>
+                                        </Link>
+                                        <div className="card-footer d-flex align-items-end pt-3 px-0 pb-0 mt-auto">
+                                            <a href="#" className="btn btn-outline-primary w-100"
+                                               onClick={() => getIntoCart(product.idProduct)}
+                                            >Thêm vào giỏ hàng</a>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (<p>Không tìm thấy!</p>)
+                    }
+                </div>
+                <div className="container d-flex align-items-center justify-content-center">
+                    <div className="my-2">
+                        <div className="row text-center">
+                            <div className="ms-auto">
+                                <nav className="bottom" aria-label="Page navigation">
+                                    <ul className="pagination mb-0 ">
+                                        <li className="page-item">
+                                            <a className={`page-link ${page === 0 ? "disabled" : ""}`}
+                                               onClick={() => setPage(0)} tabIndex="-1" href="#"
+                                               aria-disabled="true">《</a>
+                                        </li>
+                                        <li className="page-item ">
+                                            <a onClick={() => previousPage()}
+                                               className={`page-link ${page <= 0 ? "disabled" : ""}`} href="#"
+                                               tabIndex="-1"
+                                               aria-disabled="true">〈 </a>
+                                        </li>
+                                        <li className="page-item" aria-current="page">
+                                            <a className="page-link" href="#">{page + 1}/{totalPage}</a>
+                                        </li>
+                                        <li className="page-item">
+                                            <a onClick={() => nextPage()}
+                                               className={`page-link ${page >= totalPage - 1 ? "disabled" : ""}`}
+                                               href="#"> 〉 </a>
+                                        </li>
+                                        <li className="page-item">
+                                            <a className={`page-link ${page >= totalPage - 1 ? "disabled" : ""}`}
+                                               href="#"
+                                               onClick={() => setPage(totalPage - 1)}> 》 </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <Footer/>
+            <Footer/>
         </>
-);
+    );
 }
