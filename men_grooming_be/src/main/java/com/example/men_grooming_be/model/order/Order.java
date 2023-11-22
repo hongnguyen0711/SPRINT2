@@ -23,7 +23,7 @@ public class Order {
     @Column(columnDefinition = "time")
     private String timeOfOrder;
     private Double totalMoney;
-
+    private Integer paymentStatus;
     @ManyToOne
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     private AppUser appUser;

@@ -114,4 +114,12 @@ public class AppUserController {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Đăng xuất thất bại, vui lòng chờ trong giây lát");
     }
+    @GetMapping("/getUser")
+    private ResponseEntity<Object> getUser(@RequestParam(name = "user") String userName){
+        AppUser appUser = appUserService.findByName(userName);
+        if (appUser == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(appUser, HttpStatus.OK);
+    }
 }

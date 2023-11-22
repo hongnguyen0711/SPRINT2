@@ -13,4 +13,6 @@ public interface IAppUserService extends UserDetailsService {
     Long findAppUserIdByUserName(String userName);
 
     AppUser findById(Long idUser);
+
+    AppUser findByName(String userName);
 }

@@ -24,30 +24,55 @@ public class CartController {
     private IAppUserService appUserService;
     @Autowired
     private IProductService productService;
+
     @PostMapping("/addToCart")
     public ResponseEntity<Object> addProductToCart(@RequestParam(name = "idProduct") Long idProduct,
                                                    @RequestParam(name = "idUser") Long idUser,
-                                                   @RequestParam(name = "quantity", defaultValue = "1", required = false) Integer quantity){
+                                                   @RequestParam(name = "quantity", defaultValue = "1", required = false) Integer quantity) {
         Cart cart = new Cart();
         Product product = productService.findById(idProduct);
         AppUser appUser = appUserService.findById(idUser);
-        if (appUser == null || product == null){
+        if (appUser == null || product == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        Cart findCart = cartService.findByIdUserAndIdProduct(idUser, idProduct);
+        if (findCart != null) {
+            cartService.addQuantity(idUser, idProduct);
+            return new ResponseEntity<>(findCart, HttpStatus.OK);
+        }
         cart.setProduct(product);
         cart.setAppUser(appUser);
         cart.setQuantityOrder(quantity);
         cartService.addToCart(cart);
         return new ResponseEntity<>(cart, HttpStatus.OK);
     }
+
     @GetMapping("/listCart")
-    private ResponseEntity<List<ICartDto>> getAllCart(@RequestParam(name = "idUser") Long idUser){
+    private ResponseEntity<List<ICartDto>> getAllCart(@RequestParam(name = "idUser") Long idUser) {
         List<ICartDto> cartDtoList = cartService.findByIdUser(idUser);
-        if (cartDtoList.isEmpty()){
+        if (cartDtoList.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<>(cartDtoList,HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(cartDtoList, HttpStatus.OK);
         }
+    }
+    @DeleteMapping("/delete")
+    public ResponseEntity<Object> deleteProduct(@RequestParam(name = "idUser") Long idUser,
+                                                @RequestParam(name = "idProduct") Long idProduct){
+        cartService.deleteProduct(idUser,idProduct);
+        return new ResponseEntity<>("Bạn đã xóa thành công",HttpStatus.OK);
+    }
+    @PostMapping("/increase")
+    public ResponseEntity<?> increaseQuantity(@RequestParam(name = "idUser") Long idUser,
+                                              @RequestParam(name = "idProduct") Long idProduct){
+        cartService.increaseQuantity(idUser, idProduct);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping("/decrease")
+    public ResponseEntity<?> decreaseQuantity(@RequestParam(name = "idUser") Long idUser,
+                                              @RequestParam(name = "idProduct") Long idProduct){
+        cartService.decreaseQuantity(idUser, idProduct);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

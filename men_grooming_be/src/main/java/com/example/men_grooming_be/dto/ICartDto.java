@@ -1,6 +1,7 @@
 package com.example.men_grooming_be.dto;
 
 public interface ICartDto {
+
     Long getIdUser();
     Long getIdProduct();
     String getName();
@@ -8,4 +9,6 @@ public interface ICartDto {
 
     String getImage();
     Integer getQuantity();
+    Integer getMaxQuantity();
+    String getBrand();
 }

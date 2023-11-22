@@ -9,4 +9,14 @@ public interface ICartService {
     void addToCart(Cart cart);
 
     List<ICartDto> findByIdUser(Long idUser);
+
+    Cart findByIdUserAndIdProduct(Long idUser, Long idProduct);
+
+    void addQuantity(Long idUser, Long idProduct);
+
+    void deleteProduct(Long idUser, Long idProduct);
+
+    void increaseQuantity(Long idUser, Long idProduct);
+
+    void decreaseQuantity(Long idUser, Long idProduct);
 }
