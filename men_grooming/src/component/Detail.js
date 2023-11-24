@@ -24,6 +24,7 @@ export function Detail() {
     })
     const getProduct = async () => {
         const res = await productService.productDetail(id);
+        console.log("-------------")
         console.log(res);
         setProduct(res.data);
     }
@@ -37,9 +38,10 @@ export function Detail() {
         setSelectedImage(images[index].name)
     };
     const getProductSameType = async () => {
-    const res = await productService.productSameType(id);
+        const res = await productService.productSameType(id);
+        console.log("======")
         console.log(res);
-    setProductSameType(res.data);
+        setProductSameType(res.data);
     }
     const getIntoCart = async (idProduct) => {
         try {
@@ -226,27 +228,32 @@ export function Detail() {
                                     <div className="card-body">
                                         <h5 className="card-title">Sản phẩm cùng loại</h5>
                                         {
-                                            productSameType.map((same)=>{
-                                                return(
-                                                    <Link to={`/detail/${same.idProduct}`} className="text-decoration-none" onClick={()=>setFlag(!flag)}>
-                                                    <div className="d-flex mb-3" key={same.idProduct}>
+                                            productSameType.map((same) => {
+                                                if (same.idProduct !== product.id) {
+                                                    return (
+                                                        <Link to={`/detail/${same.idProduct}`}
+                                                              className="text-decoration-none"
+                                                              onClick={() => setFlag(!flag)}>
+                                                            <div className="d-flex mb-3" key={same.idProduct}>
 
-                                                        <a href="#" className="me-3">
-                                                            <img
-                                                                src={same.firstImage}
-                                                                style={{minWidth: "96px", height: "96px"}}
-                                                                className="img-md img-thumbnail"/>
-                                                        </a>
-                                                        <div className="info">
-                                                            <a href="#" className="nav-link mb-1">
-                                                                {same.nameProduct}
-                                                            </a>
-                                                            <strong className="text-dark">{vnd.format(same.priceProduct)}</strong>
-                                                        </div>
+                                                                <a href="#" className="me-3">
+                                                                    <img
+                                                                        src={same.firstImage}
+                                                                        style={{minWidth: "96px", height: "96px"}}
+                                                                        className="img-md img-thumbnail"/>
+                                                                </a>
+                                                                <div className="info">
+                                                                    <a href="#" className="nav-link mb-1">
+                                                                        {same.nameProduct}
+                                                                    </a>
+                                                                    <strong
+                                                                        className="text-dark">{vnd.format(same.priceProduct)}</strong>
+                                                                </div>
 
-                                                    </div>
-                                                    </Link>
-                                                );
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                }
                                             })
                                         }
 

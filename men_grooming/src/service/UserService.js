@@ -16,6 +16,7 @@ export const registerUser = async (appUser) => {
 }
 export const getJwtToken = () => {
     const jwtToken = localStorage.getItem("JWT");
+    console.log(jwtToken);
     if (jwtToken) {
         return jwtDecode(jwtToken)
     }

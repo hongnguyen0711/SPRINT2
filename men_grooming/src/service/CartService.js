@@ -12,7 +12,6 @@ export const addToCart = async (idProduct, idUser, quantity) => {
 
 export const deleteCart = async (idUser, idProduct) => {
     const res = await axios.delete(`http://localhost:8080/api/cart/delete?idUser=${idUser}&idProduct=${idProduct}`);
-    console.log(res)
     return res;
 };
 

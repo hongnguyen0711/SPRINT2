@@ -31,6 +31,7 @@ const [historys, setHistorys] = useState([]);
     }
 
     useEffect(() => {
+        document.title = "Men's Grooming - Khách hàng " ;
         getCustomer();
         getHistory();
     }, []);
@@ -110,7 +111,7 @@ const [historys, setHistorys] = useState([]);
                                     </tr>
                                 )
                             })) : (<tr>
-                            <td colSpan={4} style={{textAlign: "center", color: "red"}}>Không tìm thấy!</td>
+                            <td colSpan={6} style={{textAlign: "center"}}>Không tìm thấy!</td>
                         </tr>)
                         }
                         </tbody>

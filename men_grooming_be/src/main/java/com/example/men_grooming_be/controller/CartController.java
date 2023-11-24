@@ -52,7 +52,7 @@ public class CartController {
     private ResponseEntity<List<ICartDto>> getAllCart(@RequestParam(name = "idUser") Long idUser) {
         List<ICartDto> cartDtoList = cartService.findByIdUser(idUser);
         if (cartDtoList.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(cartDtoList, HttpStatus.OK);
         }

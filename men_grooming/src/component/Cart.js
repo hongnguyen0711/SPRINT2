@@ -1,6 +1,7 @@
 import {Header} from "./Header";
 import React, {useEffect, useState} from "react";
 import {Footer} from "./Footer";
+import Swal from 'sweetalert2';
 import * as userService from "../service/UserService";
 import * as cartService from "../service/CartService";
 import * as orderServise from "../service/OrderService";
@@ -27,50 +28,86 @@ export function Cart() {
             const jwtToken = await userService.getJwtToken();
             const user = await userService.getUser(jwtToken.sub);
             const result = await cartService.getAllCart(user.id);
+            console.log(result)
             setProducts(result.data);
             setId(user.id);
         } catch (e) {
 
         }
     }
-    const sum = products.reduce((acc, current) => acc + current.price * current.quantity, 0);
-    const sumPay = sum / 20000;
+
+    let sum = 0;
+    let sumPay = 0;
+
+    try {
+        sum = products.reduce((acc, current) => acc + current.price * current.quantity, 0);
+        sumPay = sum / 20000;
+    } catch (e) {
+    }
 
 
     const deleteCart = async (idProduct, idUser) => {
         const res = await cartService.deleteCart(idUser, idProduct);
-        setFlag(!flag);
         if (res.status === 200) {
             toast("Xóa sản phẩm thành công!");
+        } else {
+            setFlag(!flag);
         }
         getAllProduct();
     }
 
     const increase = async (idProduct, idUser) => {
         await cartService.increaseQuantity(idUser, idProduct);
+        setFlag(!flag);
         getAllProduct();
     }
-    const decrease = async (idProduct, idUser) => {
-        await cartService.decreaseQuantity(idUser, idProduct);
-        getAllProduct();
+    const decrease = async (idProduct, idUser, quantity) => {
+        if (quantity === 1) {
+            Swal.fire({
+                title: 'Bạn có muốn xóa sản phẩm không ?',
+                text: 'Lưu ý hoạt động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Vâng, tôi muốn xóa!',
+                cancelButtonText: 'Không!',
+                reverseButtons: true,
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await cartService.decreaseQuantity(idUser, idProduct);
+                    getAllProduct();
+                    toast("Xóa thành công");
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire('Đã Hủy', 'Sản phẩm của bạn vẫn còn trong giỏ hàng.', 'info');
+                }
+            });
+        } else {
+            await cartService.decreaseQuantity(idUser, idProduct);
+            setFlag(!flag);
+            getAllProduct();
+        }
     }
 
 
     useEffect(() => {
+        document.title = "Men's Grooming - Giỏ hàng ";
         getAllProduct();
 
     }, [flag]);
 
-    console.log(sum)
 
 
     const createOrder = (data, actions) => {
-        console.log(sumPay  )
+        if (sumPay <= 0) {
+            // Xử lý lỗi nếu giá trị không hợp lệ
+            console.error("Giá trị không hợp lệ cho đơn đặt hàng PayPal.");
+            return null; // Hoặc bạn có thể trả về một giá trị mặc định khác
+        }
+
         return actions.order.create({
             purchase_units: [
                 {
                     amount: {
-                        value: sumPay,
+                        value: sumPay.toFixed(2),
                         currency_code: 'USD',
                     },
                 },
@@ -90,11 +127,10 @@ export function Cart() {
 
     const onError = (err) => {
         console.error('Payment failed:', err);
+        toast("Không thành công!")
     };
 
     return (
-        // sum && sumPay &&
-        products &&
         <>
             <Header/>
             <section className="bg-light my-5">
@@ -129,7 +165,7 @@ export function Cart() {
                                                                 <div className="d-flex align-items-center">
                                                                     <button className="btn btn-outline-secondary mx-2"
                                                                             type="button" id="decrementBtn"
-                                                                            onClick={() => decrease(product.idProduct, product.idUser)}>-
+                                                                            onClick={() => decrease(product.idProduct, product.idUser, product.quantity)}>-
                                                                     </button>
                                                                     <p className="my-auto mx-auto"
                                                                        style={{width: "15px"}}>{product.quantity}</p>
@@ -190,8 +226,12 @@ export function Cart() {
                                         <p className="mb-2">{vnd.format(sum)}</p>
                                     </div>
                                     <div className="d-flex justify-content-between">
-                                        <p className="mb-2">Thuế:</p>
+                                        <p className="mb-2">VAT:</p>
                                         <p className="mb-2">{vnd.format(sum * 8 / 100)}</p>
+                                    </div>
+                                    <div className="d-flex justify-content-between">
+                                        <p className="mb-2">Phí giao hàng:</p>
+                                        <p className="mb-2">{vnd.format(0)}</p>
                                     </div>
                                     <hr/>
                                     <div className="d-flex justify-content-between">
@@ -200,14 +240,14 @@ export function Cart() {
                                     </div>
 
                                     <div className="mt-3">
-                                        {/*<a href="#" className="btn btn-success w-100 shadow-0 mb-2"> Thanh toán</a>*/}
+                                       
                                         <PayPalScriptProvider
                                             options={{"client-id": "ATVLu4Mi0WmojMeUtCh-wTtCBb37GExzwi18B7kLRGSX9bUvnLq92Rnm02UnBCRPu_KGIgnkFOCOP94E"}}
                                         >
                                             <PayPalButtons createOrder={createOrder} onApprove={onApprove}
                                                            onError={onError}/>
                                         </PayPalScriptProvider>
-                                        <Link to="/">
+                                        <Link to="/list">
                                             <a href="#" className="btn btn-light w-100 border mt-2"> Tiếp tục mua
                                                 hàng</a>
                                         </Link>

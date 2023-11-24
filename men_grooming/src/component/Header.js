@@ -77,9 +77,14 @@ return(
                             </ul>
                         </li>
                         <li className="nav-item">
-                            <Link to={"/info"} className="text-decoration-none">
-                                <a className="nav-link active" aria-current="page" href="#">Thông tin</a>
-                            </Link>
+                            {isLoggedIn ? (
+                                <Link to={"/info"} className="text-decoration-none">
+                                    <a className="nav-link active" aria-current="page" href="#">Thông tin cá nhân</a>
+                                </Link>
+                            ) : (
+                               <p></p>
+                            )}
+
                         </li>
                     </ul>
                     <form className="d-flex">

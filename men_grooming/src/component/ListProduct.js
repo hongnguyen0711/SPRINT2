@@ -54,6 +54,7 @@ export function ListProduct() {
     const getIntoCart = async (idProduct) => {
         try {
             const jwtToken = await loginService.getJwtToken();
+            console.log(jwtToken);
             if (!jwtToken) {
                 navigate("/login")
                 toast("Vui lòng đăng nhập!")
@@ -70,6 +71,7 @@ export function ListProduct() {
     }
 
     useEffect(() => {
+        document.title = "Men's Grooming - Sản phẩm " ;
         getProductList();
         getCategoryList();
     }, [page, refresh, sort]);

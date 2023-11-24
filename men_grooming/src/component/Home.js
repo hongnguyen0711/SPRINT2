@@ -25,6 +25,7 @@ export function Home() {
     }
 
     useEffect(() => {
+        document.title = "Men's Grooming - Home " ;
         getProductList();
         if (localStorage.getItem("JWT")) {
             setIsLoggedIn(true);
